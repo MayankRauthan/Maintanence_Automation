@@ -52,16 +52,16 @@ inventory_mapping_dict = {}
 date_router={}
 
 def initialize_path(source_file_name, target_file_name, inventory_file_name):
-    global SOURCE_FILE_PATH, TARGET_FILE_PATH, inventory_file_path
+    global SOURCE_FILE_PATH, TARGET_FILE_PATH, INVENTORY_FILE_PATH
     SOURCE_FILE_PATH = os.path.join(os.getcwd(), "maintainance", source_file_name)
     TARGET_FILE_PATH = os.path.join(os.getcwd(), "maintainance", target_file_name)
-    inventory_file_path = os.path.join(os.getcwd(), "maintainance", inventory_file_name)
+    INVENTORY_FILE_PATH = os.path.join(os.getcwd(), "maintainance", inventory_file_name)
 
 
     global SOURCE_FILE, TARGET_FILE, INVENTORY_FILE, source_sheet, target_sheet, inventory_sheet
     SOURCE_FILE = load_workbook(SOURCE_FILE_PATH, data_only=True)
     TARGET_FILE = load_workbook(TARGET_FILE_PATH)
-    INVENTORY_FILE = load_workbook(inventory_file_path, data_only=True)
+    INVENTORY_FILE = load_workbook(INVENTORY_FILE_PATH, data_only=True)
     # ================= SHEETS =================
     source_sheet = SOURCE_FILE["Scheduled Maintenance"]
     target_sheet = TARGET_FILE["OBS Maintenance Tracker"]

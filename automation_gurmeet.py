@@ -18,28 +18,28 @@ from copy import copy
 
 
 # Define file paths
-SOURCE_FILE_PATH = os.path.join(os.getcwd(), "maintainance", "Maintenance-Data (1).xlsx")
-TARGET_FILE_PATH= os.path.join(os.getcwd(), "maintainance", "Haleon -Network planned maintenance tracker Week 24_08 June_2026.xlsx")
-INVENTORY_FILE_PATH = os.path.join(os.getcwd(), "maintainance", "Haleon WAN Inventory.xlsx")
+SOURCE_FILE_PATH = ''  # will be initialized in the orchestration function
+TARGET_FILE_PATH= ''  # will be initialized in the orchestration function
+INVENTORY_FILE_PATH = ''  # will be initialized in the orchestration function
 
 # Load the workbooks
-SOURCE_FILE = load_workbook(SOURCE_FILE_PATH, data_only=True)
-TARGET_FILE = load_workbook(TARGET_FILE_PATH, data_only=True)
-INVENTORY_FILE = load_workbook(INVENTORY_FILE_PATH, data_only=True)
+SOURCE_FILE = ''
+TARGET_FILE = ''
+INVENTORY_FILE = ''
 
 # Load the sheets
 # Load target sheets
-target_sheet_scheduled_maintenance = TARGET_FILE["Scheduled Maintenance"]
-target_sheet_completed_maintenance = TARGET_FILE["Completed Maintenance"]
+target_sheet_scheduled_maintenance = ''  # will be initialized in the orchestration function
+target_sheet_completed_maintenance = ''  # will be initialized in the orchestration function
 
 # Load inventory sheet
-inventory_sheet = INVENTORY_FILE["Haleon WAN Inventory"]    
+inventory_sheet = ''  # will be initialized in the orchestration function
 
 
 #Load source sheets
-source_sheet_orange = SOURCE_FILE["Orange"]
-source_sheet_carrier = SOURCE_FILE["Carrier"]
-cover_sheet = TARGET_FILE["Cover"]
+source_sheet_orange = ''  # will be initialized in the orchestration function
+source_sheet_carrier = ''  # will be initialized in the orchestration function
+cover_sheet = ''  # will be initialized in the orchestration function
 
 # save the file name with date added ( YYYY-MM-DD ) to avoid overwriting previous outputs
 output_file = f"Haleon_Automated_Maintenance_Output_{date.today().isoformat()}.xlsx"
@@ -68,6 +68,41 @@ Red_fill = PatternFill(fill_type="solid", fgColor="FF0000")    # red
 
 thin = Side(style="thin", color="000000")
 thin_border = Border(left=thin, right=thin, top=thin, bottom=thin)
+
+
+def initialize_path(source_file_name, target_file_name, inventory_file_name):
+    global SOURCE_FILE_PATH, TARGET_FILE_PATH, INVENTORY_FILE_PATH
+
+    print("Exists:", os.path.exists(INVENTORY_FILE_PATH))
+    print("Extension:", os.getcwd())
+
+    SOURCE_FILE_PATH = os.path.join(os.getcwd(), "maintainance", source_file_name)
+    TARGET_FILE_PATH = os.path.join(os.getcwd(), "maintainance", target_file_name)
+    INVENTORY_FILE_PATH = os.path.join(os.getcwd(), "maintainance", inventory_file_name)
+
+    # Load the sheets
+    global SOURCE_FILE, TARGET_FILE, INVENTORY_FILE
+    SOURCE_FILE = load_workbook(SOURCE_FILE_PATH, data_only=True)
+    TARGET_FILE = load_workbook(TARGET_FILE_PATH, data_only=True)
+    INVENTORY_FILE = load_workbook(INVENTORY_FILE_PATH, data_only=True)
+
+    
+    # Load target sheets
+    global target_sheet_scheduled_maintenance, target_sheet_completed_maintenance
+    target_sheet_scheduled_maintenance = TARGET_FILE["Scheduled Maintenance"]
+    target_sheet_completed_maintenance = TARGET_FILE["Completed Maintenance"]
+
+    # Load inventory sheet
+    global inventory_sheet
+    inventory_sheet = INVENTORY_FILE["Haleon WAN Inventory"]    
+
+
+    #Load source sheets
+    global source_sheet_orange, source_sheet_carrier, cover_sheet
+    source_sheet_orange = SOURCE_FILE["Orange"]
+    source_sheet_carrier = SOURCE_FILE["Carrier"]
+    cover_sheet = TARGET_FILE["Cover"]
+
 
 
 # maps device name to site name using the inventory sheet and stores it in a dictionary for quick lookup 
@@ -501,7 +536,8 @@ def update_cover_date_week():
     week_no = now.isocalendar()[1]
     cover_sheet["B9"] = f"{now.strftime('%d-%b-%Y')} - Week {week_no}"
 
-def orchestration():
+def orchestration(source_file_name, target_file_name, inventory_file_name):
+    initialize_path(source_file_name, target_file_name, inventory_file_name)
     inventory_mapping()
     orange_mapping()
     carrier_mapping()
@@ -513,7 +549,7 @@ def orchestration():
     update_no()
     update_cover_date_week()
     save_output()
+    return output_file
     
 
 
-orchestration()
